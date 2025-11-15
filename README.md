@@ -105,6 +105,13 @@ PROXY_SOURCES = {
 ## 🎨 UI Preview
 
 <div align="center">
+<img width="1105" height="383" alt="mg1" src="https://github.com/user-attachments/assets/0ef8077f-263a-4f45-90fc-3051fc40cf96" />
+<img width="1136" height="239" alt="mg2" src="https://github.com/user-attachments/assets/ef7c327b-6c4a-4f71-b607-636105220dd0" />
+<img width="1308" height="138" alt="mg3" src="https://github.com/user-attachments/assets/a55d8a2f-ec73-4960-8774-4e05f340ba4d" />
+
+
+
+
 
 
 
