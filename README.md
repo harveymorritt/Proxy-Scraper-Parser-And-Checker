@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔵 Proxy Tool
+#  Proxy Tool
 
 ### *Advanced Proxy Checker & Scraper*
 
@@ -17,24 +17,24 @@ Modern proxy collection and validation tool with beautiful CLI interface
 
 </div>
 
-## ✨ Features
+##  Features
 
 <table>
 <tr>
 <td>
 
-- 🎨 **Beautiful Interface**
-- ⚡ **Async Checking**
-- 🔄 **4 Protocols** - SOCKS5, SOCKS4, HTTP, HTTPS
-- 📊 **Live Statistics**
+-  **Beautiful Interface**
+-  **Async Checking**
+-  **4 Protocols** - SOCKS5, SOCKS4, HTTP, HTTPS
+-  **Live Statistics**
 
 </td>
 <td>
 
-- 🗂️ **Organized Output**
-- 🎯 **Auto Detection**
-- 🔧 **Configurable**
-- 💾 **Auto Save**
+-  **Organized Output**
+-  **Auto Detection**
+-  **Configurable**
+-  **Auto Save**
 
 </td>
 </tr>
@@ -42,7 +42,7 @@ Modern proxy collection and validation tool with beautiful CLI interface
 
 ---
 
-## 🚀 Installation
+##  Installation
 
 ### Prerequisites
 
@@ -53,7 +53,7 @@ Python 3.8+
 
 ---
 
-### 🛠️ Quick Setup
+###  Quick Setup
 
 ```bash
 # Clone or Download the Repository
@@ -103,7 +103,7 @@ PROXY_SOURCES = {
 
 
 
-## 🎨 UI Preview
+##  UI Preview
 
 <div align="center">
 <img width="1105" height="383" alt="mg1" src="https://github.com/user-attachments/assets/0ef8077f-263a-4f45-90fc-3051fc40cf96" />
