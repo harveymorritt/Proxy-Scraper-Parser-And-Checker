@@ -224,11 +224,12 @@ async def main() -> None:
     ))
 
 
+
     console.print()
     output_base = OUTPUT_DIR / f"{protocol}_live"
     
     console.print(Panel(
-        "[1] TXT (default)\n[2] JSON\n[3] CSV",
+        "[1] TXT (no geolocation)\n[2] JSON (with geolocation)\n[3] CSV (with geolocation)",
         title="[bold cyan]Select Export Format[/bold cyan]",
         border_style="bright_blue",
         padding=(1, 2)
@@ -240,16 +241,23 @@ async def main() -> None:
         default="1"
     )
 
+    geo_data = None
+    if format_choice in ["2", "3"]:
+        from utils.checker import batch_geolocate_proxies
+        with console.status("[bold blue]Fetching geolocation data...[/bold blue]", spinner="dots12"):
+            geo_data = await batch_geolocate_proxies(live_proxies)
+        console.print(f"[green]✓[/green] Geolocated [cyan bold]{len(geo_data):,}[/cyan bold] proxies")
+
     with console.status(f"[bold blue]Saving proxies...", spinner="dots12"):
         try:
             if format_choice == "2":
                 output_file = output_base.with_suffix('.json')
                 from storage import save_proxies_json
-                save_proxies_json(live_proxies, output_file)
+                save_proxies_json(live_proxies, output_file, geo_data)
             elif format_choice == "3":
                 output_file = output_base.with_suffix('.csv')
                 from storage import save_proxies_csv
-                save_proxies_csv(live_proxies, output_file)
+                save_proxies_csv(live_proxies, output_file, geo_data)
             else:
                 output_file = output_base.with_suffix('.txt')
                 save_proxies(live_proxies, output_file)
