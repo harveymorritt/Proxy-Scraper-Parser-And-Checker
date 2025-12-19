@@ -223,12 +223,36 @@ async def main() -> None:
         padding=(1, 2)
     ))
 
+
     console.print()
-    output_file = OUTPUT_DIR / f"{protocol}_live.txt"
+    output_base = OUTPUT_DIR / f"{protocol}_live"
     
-    with console.status(f"[bold blue]Saving to {output_file.name}...", spinner="dots12"):
+    console.print(Panel(
+        "[1] TXT (default)\n[2] JSON\n[3] CSV",
+        title="[bold cyan]Select Export Format[/bold cyan]",
+        border_style="bright_blue",
+        padding=(1, 2)
+    ))
+    
+    format_choice = Prompt.ask(
+        "[cyan]Enter format choice[/cyan]",
+        choices=["1", "2", "3"],
+        default="1"
+    )
+
+    with console.status(f"[bold blue]Saving proxies...", spinner="dots12"):
         try:
-            save_proxies(live_proxies, output_file)
+            if format_choice == "2":
+                output_file = output_base.with_suffix('.json')
+                from storage import save_proxies_json
+                save_proxies_json(live_proxies, output_file)
+            elif format_choice == "3":
+                output_file = output_base.with_suffix('.csv')
+                from storage import save_proxies_csv
+                save_proxies_csv(live_proxies, output_file)
+            else:
+                output_file = output_base.with_suffix('.txt')
+                save_proxies(live_proxies, output_file)
         except Exception as e:
             console.print(Panel(
                 f"[red]✗ Save failed: {e}",

@@ -42,3 +42,36 @@ async def check_proxy(proxy: str, protocol: str, semaphore: asyncio.Semaphore) -
                 continue
         
         return proxy, False
+
+async def batch_geolocate_proxies(proxies: list[str]) -> dict[str, dict]:
+    """
+    Geolocates a list of proxies using ip-api.com batch endpoint.
+    Returns: {proxy_ip: {'country': 'US', 'countryCode': 'US', ...}}
+    """
+    api_url = "http://ip-api.com/batch"
+    results = {}
+    
+    # Extract IPs from proxies (remove ports)
+    ips = [p.split(':')[0] for p in proxies]
+    
+    # Process in chunks of 100 (API limit)
+    chunk_size = 100
+    
+    async with aiohttp.ClientSession() as session:
+        for i in range(0, len(ips), chunk_size):
+            chunk = ips[i:i + chunk_size]
+            try:
+                async with session.post(api_url, json=chunk, timeout=30) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        for ip, info in zip(chunk, data):
+                            if info.get('status') == 'success':
+                                results[ip] = {
+                                    'country': info.get('country', 'Unknown'),
+                                    'countryCode': info.get('countryCode', '??'),
+                                    'city': info.get('city', 'Unknown')
+                                }
+            except Exception:
+                continue
+                
+    return results
