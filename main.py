@@ -16,19 +16,9 @@ from config import PROXY_SOURCES, OUTPUT_DIR, CONCURRENT_CHECKS, TIMEOUT
 from fetcher import fetch_all_sources
 from patterns import extract_proxies
 from storage import save_proxies
-from utils.socks5 import check_socks5_proxy
-from utils.socks4 import check_socks4_proxy
-from utils.http import check_http_proxy
-from utils.https import check_https_proxy
+from utils.checker import check_proxy
 
 console = Console()
-
-PROTOCOL_CHECKERS = {
-    'socks5': check_socks5_proxy,
-    'socks4': check_socks4_proxy,
-    'http': check_http_proxy,
-    'https': check_https_proxy,
-}
 
 
 def print_header() -> None:
@@ -110,8 +100,7 @@ def create_stats_table(total: int, checked: int, alive: int, elapsed: float) -> 
 
 async def check_proxies_with_progress(proxies: set[str], protocol: str) -> list[str]:
     semaphore = asyncio.Semaphore(CONCURRENT_CHECKS)
-    checker = PROTOCOL_CHECKERS[protocol]
-    tasks = [checker(proxy, semaphore) for proxy in proxies]
+    tasks = [check_proxy(proxy, protocol, semaphore) for proxy in proxies]
 
     results: list[str] = []
     total = len(tasks)
