@@ -16,19 +16,9 @@ from config import PROXY_SOURCES, OUTPUT_DIR, CONCURRENT_CHECKS, TIMEOUT
 from fetcher import fetch_all_sources
 from patterns import extract_proxies
 from storage import save_proxies
-from utils.socks5 import check_socks5_proxy
-from utils.socks4 import check_socks4_proxy
-from utils.http import check_http_proxy
-from utils.https import check_https_proxy
+from utils.checker import check_proxy
 
 console = Console()
-
-PROTOCOL_CHECKERS = {
-    'socks5': check_socks5_proxy,
-    'socks4': check_socks4_proxy,
-    'http': check_http_proxy,
-    'https': check_https_proxy,
-}
 
 
 def print_header() -> None:
@@ -110,8 +100,7 @@ def create_stats_table(total: int, checked: int, alive: int, elapsed: float) -> 
 
 async def check_proxies_with_progress(proxies: set[str], protocol: str) -> list[str]:
     semaphore = asyncio.Semaphore(CONCURRENT_CHECKS)
-    checker = PROTOCOL_CHECKERS[protocol]
-    tasks = [checker(proxy, semaphore) for proxy in proxies]
+    tasks = [check_proxy(proxy, protocol, semaphore) for proxy in proxies]
 
     results: list[str] = []
     total = len(tasks)
@@ -234,12 +223,44 @@ async def main() -> None:
         padding=(1, 2)
     ))
 
+
+
     console.print()
-    output_file = OUTPUT_DIR / f"{protocol}_live.txt"
+    output_base = OUTPUT_DIR / f"{protocol}_live"
     
-    with console.status(f"[bold blue]Saving to {output_file.name}...", spinner="dots12"):
+    console.print(Panel(
+        "[1] TXT (no geolocation)\n[2] JSON (with geolocation)\n[3] CSV (with geolocation)",
+        title="[bold cyan]Select Export Format[/bold cyan]",
+        border_style="bright_blue",
+        padding=(1, 2)
+    ))
+    
+    format_choice = Prompt.ask(
+        "[cyan]Enter format choice[/cyan]",
+        choices=["1", "2", "3"],
+        default="1"
+    )
+
+    geo_data = None
+    if format_choice in ["2", "3"]:
+        from utils.checker import batch_geolocate_proxies
+        with console.status("[bold blue]Fetching geolocation data...[/bold blue]", spinner="dots12"):
+            geo_data = await batch_geolocate_proxies(live_proxies)
+        console.print(f"[green]✓[/green] Geolocated [cyan bold]{len(geo_data):,}[/cyan bold] proxies")
+
+    with console.status(f"[bold blue]Saving proxies...", spinner="dots12"):
         try:
-            save_proxies(live_proxies, output_file)
+            if format_choice == "2":
+                output_file = output_base.with_suffix('.json')
+                from storage import save_proxies_json
+                save_proxies_json(live_proxies, output_file, geo_data)
+            elif format_choice == "3":
+                output_file = output_base.with_suffix('.csv')
+                from storage import save_proxies_csv
+                save_proxies_csv(live_proxies, output_file, geo_data)
+            else:
+                output_file = output_base.with_suffix('.txt')
+                save_proxies(live_proxies, output_file)
         except Exception as e:
             console.print(Panel(
                 f"[red]✗ Save failed: {e}",
