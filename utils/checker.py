@@ -4,6 +4,7 @@ from aiohttp_socks import ProxyConnector
 from typing import Tuple, Optional
 from config import TEST_URLS, TIMEOUT
 
+
 async def check_proxy(proxy: str, protocol: str, semaphore: asyncio.Semaphore) -> Tuple[str, bool]:
     """
     Checks if a proxy is alive.
