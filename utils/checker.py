@@ -1,6 +1,7 @@
 import asyncio
 import aiohttp
 from aiohttp_socks import ProxyConnector
+
 from typing import Tuple, Optional
 from config import TEST_URLS, TIMEOUT
 
@@ -43,6 +44,7 @@ async def check_proxy(proxy: str, protocol: str, semaphore: asyncio.Semaphore) -
                 continue
         
         return proxy, False
+
 
 async def batch_geolocate_proxies(proxies: list[str]) -> dict[str, dict]:
     """
