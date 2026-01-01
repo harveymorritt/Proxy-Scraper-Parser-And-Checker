@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 PROXY_SOURCES = {
     'socks5': [
         'https://raw.githubusercontent.com/dpangestuw/Free-Proxy/refs/heads/main/socks5_proxies.txt',
@@ -54,4 +55,5 @@ CONCURRENT_CHECKS = 1000
 
 
 OUTPUT_DIR = Path('proxies')
+
 OUTPUT_DIR.mkdir(exist_ok=True)
