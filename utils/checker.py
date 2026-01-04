@@ -1,24 +1,22 @@
 import asyncio
 import aiohttp
 from aiohttp_socks import ProxyConnector
-
 from typing import Tuple, Optional
-from config import TEST_URLS, TIMEOUT
 
 
-async def check_proxy(proxy: str, protocol: str, semaphore: asyncio.Semaphore) -> Tuple[str, bool]:
+async def check_proxy(proxy: str, protocol: str, semaphore: asyncio.Semaphore, test_urls: List[str], timeout: str) -> Tuple[str, bool]:
     """
     Checks if a proxy is alive.
     For HTTP/HTTPS: uses aiohttp with proxy parameter.
     For SOCKS4/5: uses aiohttp_socks ProxyConnector.
     """
     async with semaphore:
-        for test_url in TEST_URLS:
+        for test_url in test_urls:
             try:
                 # Prepare arguments for request
                 session_kwargs = {}
                 request_kwargs = {
-                    'timeout': aiohttp.ClientTimeout(total=TIMEOUT),
+                    'timeout': aiohttp.ClientTimeout(total=timeout),
                 }
 
                 if protocol in ('http', 'https'):

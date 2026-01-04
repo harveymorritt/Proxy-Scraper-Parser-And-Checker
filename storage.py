@@ -4,7 +4,6 @@ from typing import List
 from pathlib import Path
 
 
-
 def save_proxies(proxies: List[str], filepath: Path) -> None:
     filepath.parent.mkdir(parents=True, exist_ok=True)
     with open(filepath, 'w', encoding='utf-8') as f:

@@ -2,7 +2,7 @@ import time
 import sys
 from pathlib import Path
 import asyncio
-from config import PROXY_SOURCES, OUTPUT_DIR, CONCURRENT_CHECKS, TIMEOUT
+from config import import_config
 from fetcher import fetch_all_sources
 from patterns import extract_proxies
 from storage import save_proxies
@@ -95,9 +95,9 @@ def create_stats_table(total: int, checked: int, alive: int, elapsed: float) -> 
     return table
 
 
-async def check_proxies_with_progress(proxies: set[str], protocol: str) -> list[str]:
-    semaphore = asyncio.Semaphore(CONCURRENT_CHECKS)
-    tasks = [check_proxy(proxy, protocol, semaphore) for proxy in proxies]
+async def check_proxies_with_progress(proxies: set[str], protocol: str, test_urls: list[str], timeout: int, concurrent_checks: int) -> list[str]:
+    semaphore = asyncio.Semaphore(concurrent_checks)
+    tasks = [check_proxy(proxy, protocol, semaphore, test_urls, timeout) for proxy in proxies]
 
     results: list[str] = []
     total = len(tasks)
@@ -143,6 +143,21 @@ async def check_proxies_with_progress(proxies: set[str], protocol: str) -> list[
 async def main() -> None:
     print_header()
     
+    config_data = import_config("program-settings.config")
+
+    PROXY_SOURCES = config_data["proxy_sources"]
+    OUTPUT_DIR = config_data["output_dir"]
+    ERROR_CODE = config_data["error_code"]
+    TEST_URLS = config_data["test_urls"]
+
+    program_options = config_data["program_options"]
+    CONCURRENT_CHECKS = program_options["concurrentchecks"]
+    TIMEOUT = program_options["timeout"]
+    FETCH_TIMEOUT = program_options["fetchtimeout"]
+
+    if ERROR_CODE != "00":
+        pass # logic for prompting user to fix errors in cofig file here
+
     protocol = create_protocol_menu()
     console.print()
     
@@ -177,7 +192,7 @@ async def main() -> None:
 
     with console.status("[bold blue]Fetching proxy sources...", spinner="dots12"):
         try:
-            raw_text = await fetch_all_sources(sources)
+            raw_text = await fetch_all_sources(sources, FETCH_TIMEOUT)
         except Exception as e:
             console.print(Panel(
                 f"[red]✗ Fetch failed: {e}",
@@ -202,7 +217,7 @@ async def main() -> None:
         ))
         return
 
-    live_proxies = await check_proxies_with_progress(proxies, protocol)
+    live_proxies = await check_proxies_with_progress(proxies, protocol, TEST_URLS, TIMEOUT, CONCURRENT_CHECKS)
 
     elapsed = time.time() - start_time
 

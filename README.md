@@ -46,10 +46,7 @@ Modern proxy collection and validation tool with beautiful CLI interface
 
 ### Prerequisites
 
-```bash
-Python 3.8+
-```
-
+The current version of the software is developed and tested using Python 3.14.2.
 
 ---
 
@@ -73,34 +70,47 @@ python main.py
 
 ## ⚙️ Configuration
 
-### `config.py` Settings
+### The program-settings.config file
 
-```python
-# Performance
-TIMEOUT = 5                 # Proxy check timeout (seconds)
-FETCH_TIMEOUT = 30          # Source fetch timeout (seconds)
-CONCURRENT_CHECKS = 1000    # Parallel check limit
+The behaviour of the program is controlled from a single file named "program-settings.config". 
 
-# Sources per protocol
-PROXY_SOURCES = {
-    'socks5': [...],
-    'socks4': [...],
-    'http': [...],
-    'https': [...]
-}
+To add custom sources simply paste them using your favourite text editor into their respective sections. The export path, and other program settings can also be configured here.
+
+If you want to comment out a line, simply inset a hashtag at the start of the line.
+
+You don't need sources for every proxy type, but naturally, at least one should have an entry.
+
+Increasing "Concurrent Checks" will improve the speed of the program, at the cost of higher CPU utilisation. The default value of 1000 is a sensible, but if you have a more (or less) powerful system you might want to change it.
+
+### Example program-settings.config
+
+```
+[socks5]
+https://raw.githubusercontent.com/dpangestuw/Free-Proxy/refs/heads/main/socks5_proxies.txt
+
+[socks4]
+https://raw.githubusercontent.com/dpangestuw/Free-Proxy/refs/heads/main/socks4_proxies.txt
+
+[http]
+https://raw.githubusercontent.com/dpangestuw/Free-Proxy/refs/heads/main/http_proxies.txt
+
+[https]
+https://raw.githubusercontent.com/proxifly/free-proxy-list/refs/heads/main/proxies/protocols/https/data.txt
+
+[test-urls]
+http://httpbin.org/ip
+
+[export-path]
+# Leave as 'proxies' to export files to the same directory the program runs from.
+proxies
+
+[options]
+Timeout: 5
+Fetch Timeout: 5
+Concurrent Checks: 1000
 ```
 
-### Adding Custom Sources
 
-```python
-PROXY_SOURCES = {
-    'socks5': [
-        'https://domain.com/proxies.txt',
-    ]
-}
-```
-
----
 
 
 
